@@ -1,8 +1,10 @@
 package com.tyro.techtalk.parsers.threatmodel
 
 object AttackScenario {
-
-  def modelAttack(target: Target, threat: Threat): AttackResult = Compromised
+  def modelAttack(target: Target, threat: Threat): AttackResult = {
+    val validCounterMeasures = threat.counteredBy.intersect(target.defendedBy)
+    if (validCounterMeasures.isEmpty) Compromised else UnCompromised
+  }
 }
 
 sealed abstract class AttackResult

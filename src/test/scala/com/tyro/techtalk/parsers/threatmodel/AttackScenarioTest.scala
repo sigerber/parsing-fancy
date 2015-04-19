@@ -7,13 +7,21 @@ import org.scalatest.{FreeSpec, Matchers}
 class AttackScenarioTest extends FreeSpec with Matchers with GeneratorDrivenPropertyChecks {
 
   "An attack scenario should" - {
-    "result in a compromised target when" - {
-      "the target is vulnerable to the threat and has no defences" in {
-        forAll { (name: String, vulnerabilities: Set[Threat]) =>
-          val target = Target(name, vulnerabilities, Set.empty)
-          vulnerabilities.foreach { threat =>
-            AttackScenario.modelAttack(target, threat) should be(Compromised)
-          }
+    "result in a compromised target" - {
+      "when the target has no defences" in {
+        forAll { (name: String, threat: Threat) =>
+          val target = Target(name, Set.empty[CounterMeasure])
+          AttackScenario.modelAttack(target, threat) should be(Compromised)
+        }
+      }
+    }
+
+    "result in an uncompromised target" - {
+      "when the target has a counter-defence" in {
+        forAll { (name: String, threat: Threat) =>
+          val target = Target(name, threat.counteredBy)
+
+          AttackScenario.modelAttack(target, threat) should be(UnCompromised)
         }
       }
     }
@@ -33,6 +41,4 @@ class AttackScenarioTest extends FreeSpec with Matchers with GeneratorDrivenProp
   }
 
   implicit val arbThreat: Arbitrary[Threat] = Arbitrary(genThreat)
-
-  implicit val arbCounterMeasure: Arbitrary[CounterMeasure] = Arbitrary(genCounterMeasure)
 }
