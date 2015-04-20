@@ -89,8 +89,8 @@ class ParserTest extends FlatSpec with Matchers {
 
   it should "parse a collection of targets" in {
 
-    val targets = Parser.parseAll(Parser.targetSection(expectedThreats), TargetFragment) match {
-      case Parser.Success(parseResult, _) => parseResult._2
+    val targets = Parser.parseAll(Parser.targetSection, TargetFragment) match {
+      case Parser.Success(parseResult, _) => parseResult
       case Parser.NoSuccess(msg, _) => throw new RuntimeException(msg)
     }
 

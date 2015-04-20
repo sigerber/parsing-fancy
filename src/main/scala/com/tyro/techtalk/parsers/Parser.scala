@@ -7,11 +7,15 @@ import scala.util.parsing.combinator.JavaTokenParsers
 
 object Parser extends JavaTokenParsers {
 
-  def threatModelScenarios = threatSection >> targetSection >> scenarioSection
+  def threatModelScenarios = threatsAndTargets >> scenarioSection
 
   private[parsers] def threatSection = "Threats:" ~> threats
 
-  private[parsers] def targetSection(threats: Iterable[Threat]) = "Targets:" ~> targets(threats) ^^ { (threats, _) }
+  private[parsers] def targetSection = "Targets:" ~> targets
+
+  private def threatsAndTargets = threatSection ~ targetSection ^^ {
+    case threats ~ targets => (threats, targets)
+  }
 
   private[parsers] def scenarioSection(threatsAndTargets: (Iterable[Threat], Iterable[Target])) = {
 
@@ -31,15 +35,12 @@ object Parser extends JavaTokenParsers {
     "Scenarios:" ~> scenarios
   }
 
-  private def targets(threats: Iterable[Threat]) = {
+  private def targets = rep1sep(target, ",")
 
-    def target = (ident <~ ("is" | "are")) ~ defences ^^ {
-      case name ~ counterMeasureNames =>
-        val counterMeasures = counterMeasureNames.map(CounterMeasure).toSet
-        Target(name, counterMeasures)
-    }
-
-    rep1sep(target, ",")
+  private def target = (ident <~ ("is" | "are")) ~ defences ^^ {
+    case name ~ counterMeasureNames =>
+      val counterMeasures = counterMeasureNames.map(CounterMeasure).toSet
+      Target(name, counterMeasures)
   }
 
   private def defences = noDefences | ("defended by" ~> identList)
