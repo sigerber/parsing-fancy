@@ -5,7 +5,7 @@ import com.tyro.techtalk.parsers.threatmodel._
 import scala.io.Source
 import scala.util.parsing.combinator.JavaTokenParsers
 
-object Parser extends JavaTokenParsers {
+object ParserPractice1 extends JavaTokenParsers {
 
   def threatModelScenarios = threatsAndTargets >> scenarioSection
 
